@@ -1,3 +1,4 @@
+
 import java.util.Scanner;
 import java.awt.Color;
 import java.awt.Font;
@@ -36,6 +37,7 @@ class AI
 	private char[][] gameBoard = new char[3][3];
 	private boolean playerTurn = true;
 	boolean isFilled = false;
+	boolean gameOver = false;
 	public void getInput()
 	{
 		int userRow = 0,userCol = 0; 
@@ -88,11 +90,13 @@ class AI
 		{
 			gameBoard = new char[3][3];
 			isFilled = false;
+			gameOver = false;
 			playerTurn = true;
 			StdDraw.clear();
 		}
-		if(StdDraw.isMousePressed() && xLoc > 0.13333 && xLoc < 1.0-0.13333 && yLoc > 0.23333 && yLoc < 0.96666 && playerTurn)
-		{
+		if(StdDraw.isMousePressed() && xLoc > 0.13333 && xLoc < 1.0-0.13333 
+		&& yLoc > 0.23333 && yLoc < 0.96666 && playerTurn && !gameOver)
+		{		
 			int row = 2-(int)((yLoc-0.23333)/0.243333);
 			int col = (int)((xLoc-0.13333)/0.243333);
 			if(row == 3) row = 2;
@@ -108,10 +112,15 @@ class AI
 				
 				playerTurn = false;
 				StdDraw.setFont(new Font("SansSerif", Font.PLAIN, 60));
-				if(isFilled) StdDraw.text(0.5, 0.1, "Tie!");
+				if(isFilled) 
+				{
+					gameOver = true;
+					StdDraw.text(0.5, 0.1, "Tie!");
+				}
 				if(checkWin(gameBoard, 'O')) 
 				{
 					isFilled = true;
+					gameOver = true;
 					StdDraw.text(0.5, 0.1, "You Won!");
 					
 				}
@@ -154,6 +163,34 @@ class AI
 				for(int d = 0; d < 3; d++)
 					tBoard[c][d] = gameBoard[c][d];
 		boolean plWin = false;
+		
+		for(int a = 0; a < 3; a++)
+		{
+			for(int b = 0; b < 3; b++)
+			{
+				if(isValid(a, b, gameBoard))
+				{
+					tBoard[a][b] = 'X';
+					
+					if(checkWin(tBoard, 'X'))
+					{
+						gameBoard[a][b] = 'X';
+						playerTurn = true;
+						gameOver = true;
+						StdDraw.text(0.5, 0.1, "You Lost!");
+						return;
+					}
+					else
+					{
+					for(int e = 0; e < 3; e++)
+						for(int f = 0; f < 3; f++)
+							tBoard[e][f] = gameBoard[e][f];
+					}
+					
+				}
+			}
+		}
+		
 		for(int a = 0; a < 3; a++)
 		{
 			for(int b = 0; b < 3; b++)
@@ -248,7 +285,6 @@ class AI
 		}
 		System.out.print("\n\n");
 		gameBoard[bestRow][bestCol] = 'X';
-		if(checkWin(gameBoard, 'X'))StdDraw.text(0.5, 0.1, "You Lost!");
 		playerTurn = true;
 	}
 	
